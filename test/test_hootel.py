@@ -2,8 +2,11 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 import allure
 import pytest
+import random
 
 
 class TestHootel(object):
@@ -19,17 +22,20 @@ class TestHootel(object):
     def teardown_method(self):
         self.browser.quit()
 
-    @pytest.mark.parametrize("email, password", [('hiwasi1765@wisnick.com', 'tesztelek2021'), ('', '')])
+    @pytest.mark.parametrize("email, password", [('progmtest4@proton.me', 'ProgMtest4')])
     @allure.title("Hootel Login")
     @allure.description("A belépés tesztelése")
     @allure.severity(allure.severity_level.TRIVIAL)
     @allure.tag("login")
     def test_login(self, email, password):
-        menu_toggle = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="navbar-toggler collapsed"]')))
+        menu_toggle = WebDriverWait(self.browser, 5).until(
+            ec.element_to_be_clickable((By.XPATH, "//button[@class = 'navbar-toggler collapsed']")))
         menu_toggle.click()
-        login_btn = self.browser.find_element(By.XPATH, '//a[@class="nav-link"]')
+        login_btn = WebDriverWait(self.browser, 5).until(
+            ec.element_to_be_clickable((By.XPATH, '//a[@class="nav-link"]')))
         login_btn.click()
 
+        time.sleep(0.5)
         email_input = self.browser.find_element(By.ID, 'email')
         email_input.send_keys(email)
 
@@ -38,11 +44,8 @@ class TestHootel(object):
 
         submit_btn = self.browser.find_element(By.NAME, 'submit')
         submit_btn.click()
-        time.sleep(1)
-        
-        login_btn = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//a[@class="nav-link"]')))
-        logout_btn = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.ID, 'logout-link')))
-        logout_btn = self.browser.find_element(By.ID, 'logout-link')
+
+        logout_btn = WebDriverWait(self.browser, 5).until(ec.element_to_be_clickable((By.ID, "logout-link")))
 
         assert logout_btn.text == "Kilépés"
 
@@ -54,3 +57,4 @@ class TestHootel(object):
         hotel_list = self.browser.find_elements(By.XPATH, '//h4[@style="cursor: pointer"]')
         assert len(hotel_list) != 0
         assert len(hotel_list) == 10
+        
